@@ -65,11 +65,15 @@ dependencies {
 
     // RxJava and RxKotlin
     implementation(libs.rxkotlin)
+    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
 
     // Retrofit and OkHttp
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    // Retrofit RxJava3 call adapter
+    implementation("com.squareup.retrofit2:adapter-rxjava3:2.11.0")
 
     // Koin Core
     implementation("io.insert-koin:koin-core:3.5.6")

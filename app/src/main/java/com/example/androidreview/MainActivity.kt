@@ -2,6 +2,7 @@ package com.example.androidreview
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -42,6 +43,9 @@ import com.example.androidreview.presentation.ProductsViewModel
 import com.example.androidreview.presentation.ResponseState
 import com.example.androidreview.presentation.homeScreen.HomeScreen
 import com.example.androidreview.ui.theme.AndroidReviewTheme
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -58,6 +62,21 @@ class MainActivity : ComponentActivity() {
                 val productsViewModel: ProductsViewModel = koinViewModel()
                 val navController = rememberNavController()
 
+                Observable.just("Apple", "Banana", "Orange")
+                    .map { fruit -> fruit.uppercase() } // transform each item
+                    .filter { it.startsWith("A")
+                    }
+                    .subscribeOn(Schedulers.io()) // run on background thread
+                    .observeOn(AndroidSchedulers.mainThread())
+
+                    .subscribe(
+                        { item ->
+                            Log.i("TAG", "=========onCreate:  $item")
+                          },   // onNext
+                        { error ->  Log.i("TAG", "==================error")
+                          },    // onError
+                        { println("Done!") }                      // onComplete
+                    )
                 NavHost(
                     navController = navController,
                     startDestination = "Welcome"

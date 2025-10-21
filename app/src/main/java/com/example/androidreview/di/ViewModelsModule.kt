@@ -9,7 +9,10 @@ import org.koin.dsl.module
 
 val viewModelsModule = module {
     single<ProductsViewModel>{
-        ProductsViewModel(get())
+        ProductsViewModel(
+            get(),
+            getProductByIDUseCaseRX = get()
+        )
     }
 
 

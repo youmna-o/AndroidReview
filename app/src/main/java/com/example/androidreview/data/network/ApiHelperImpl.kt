@@ -1,7 +1,9 @@
 package com.example.androidreview.data.network
 
+import com.example.androidreview.data.models.ProductResponseDTO
 import com.example.androidreview.data.models.ProductsResponseDTO
 import com.example.androidreview.utils.AppConstants
+import io.reactivex.rxjava3.core.Single
 import retrofit2.Response
 
 /*Parameter vs Property:
@@ -23,5 +25,16 @@ class ApiHelperImpl (private val apiService: ApiService): ApiHelper{
         }else{
             throw Exception("API call failed with response code: ${response.code()}")
         }
+    }
+
+    override fun getProductByIDRX(id: Int): Single<ProductResponseDTO> {
+        val response : Single<Response<ProductResponseDTO>> = apiService.getProductByIDRX(id)
+         return response.map { response ->
+             if (response.isSuccessful)
+                 response.body()?: throw Exception("Response body is null")
+             else {
+                 throw Exception("API call failed with response code: ${response.code()}")
+             }
+         }
     }
 }

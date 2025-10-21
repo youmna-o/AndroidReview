@@ -3,13 +3,16 @@ package com.example.androidreview.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidreview.domain.entities.ProductResponse
+import com.example.androidreview.domain.useCases.GetProductByIDUseCaseRX
 import com.example.androidreview.domain.useCases.GetProductsUseCase
+import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProductsViewModel(private val getProductsUseCase: GetProductsUseCase): ViewModel() {
+class ProductsViewModel(private val getProductsUseCase: GetProductsUseCase,
+    private val getProductByIDUseCaseRX: GetProductByIDUseCaseRX
+    ): ViewModel() {
     //must specific the type of StateFlow
     private val mutableProductListState :MutableStateFlow<ResponseState<List<ProductResponse>>> = MutableStateFlow(ResponseState.Loading())
     val productListState = mutableProductListState.asStateFlow()
@@ -38,6 +41,19 @@ class ProductsViewModel(private val getProductsUseCase: GetProductsUseCase): Vie
                 .onFailure {
                 mutableProductListState.value = ResponseState.Error(it)
             }
+        }
+    }
+
+    // Return Single so caller can apply subscribeOn/observeOn; convert failure Result to Single.error
+    fun getProductsByIdRX(id: Int): Single<ProductResponse> {
+        val result = getProductByIDUseCaseRX.invoke(id)
+        return result.fold(
+            onSuccess = { it },
+            onFailure = { Single.error(it) }
+        ).doOnSuccess { product ->
+            mutableProductState.value = ResponseState.Success(product)
+        }.doOnError { err ->
+            mutableProductState.value = ResponseState.Error(err)
         }
     }
 

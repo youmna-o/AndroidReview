@@ -16,5 +16,14 @@ class ProductMapper {
             )
         }
     }
+    fun mapProductIDResponseDto(response: ProductResponseDTO): ProductResponse {
+        return ProductResponse(
+                id = response.id,
+                title = response.title,
+                price = response.price,
+                description = response.description,
+                image = response.thumbnail)
 
-}
+        }
+    }
+

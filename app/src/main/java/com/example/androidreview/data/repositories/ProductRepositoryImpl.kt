@@ -5,6 +5,7 @@ import com.example.androidreview.data.mappers.ProductMapper
 import com.example.androidreview.data.models.ProductResponseDTO
 import com.example.androidreview.domain.entities.ProductResponse
 import com.example.androidreview.domain.repositories.ProductRepository
+import io.reactivex.rxjava3.core.Single
 
 
 class ProductRepositoryImpl(
@@ -19,5 +20,18 @@ class ProductRepositoryImpl(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override fun getProductIDRX(id:Int): Result<Single<ProductResponse>> {
+        return try {
+            val responseDTO = productsRemoteDataSource.getProductByIDRX(id)
+            val response = responseDTO.map { dto ->
+                productMapper.mapProductIDResponseDto(dto)
+            }
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
     }
 }

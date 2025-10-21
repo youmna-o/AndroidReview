@@ -1,6 +1,8 @@
 package com.example.androidreview
 
 import android.os.Bundle
+import android.util.Log
+import android.util.Log.e
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.size
@@ -19,12 +21,16 @@ import coil.load
 import com.example.androidreview.databinding.ActivityDetailsBinding
 import com.example.androidreview.presentation.ProductsViewModel
 import com.example.androidreview.presentation.ResponseState
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailsBinding
     private val productsViewModel: ProductsViewModel by viewModel()
+    private var disposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,40 +39,70 @@ class DetailsActivity : AppCompatActivity() {
 
         val id = intent.getIntExtra("itemId", -1)
         if (id != -1) {
-            productsViewModel.getProductsById(id)
-        }
-
-        // Collect the state safely with lifecycle awareness
-        lifecycleScope.launch {
-//   Without repeatOnLifecycle, your collector:
-//            keeps running even when the Activity is paused or destroyed ❌
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                productsViewModel.productState.collect { state ->
-                    when (state) {
-                        is ResponseState.Loading -> {
-                            binding.title.text = "Loading..."
-                        }
-
-                        is ResponseState.Success -> {
-                            val product = state.data
-                            if (product != null) {
-                                binding.title.text = product.title
-                                binding.price.text = "${product.price} $"
-                                binding.description.text = product.description
-                                binding.image.load(product.image)
-                            } else {
-                                binding.title.text = "Product not found"
-                            }
-                        }
-
-                        is ResponseState.Error -> {
-                            binding.title.text = "Error: ${state.error.message}"
-                        }
+            disposable = productsViewModel.getProductsByIdRX(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { product ->
+                        binding.title.text = product.title
+                        binding.price.text = "${product.price} $"
+                        binding.description.text = product.description
+                        binding.image.load(product.image)
+                    },
+                    { error ->
+                        binding.title.text = "Error: ${error.message}"
+                        Log.e("DetailsActivity", "Product load failed", error)
                     }
-                }
-                // }
-            }
+                )
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable?.dispose()
+    }
 }
+
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        binding = ActivityDetailsBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
+//
+//        val id = intent.getIntExtra("itemId", -1)
+//        if (id != -1) {
+//            productsViewModel.getProductsById(id)
+//        }
+//
+//        // Collect the state safely with lifecycle awareness
+//        lifecycleScope.launch {
+//    //   Without repeatOnLifecycle, your collector:
+//   //            keeps running even when the Activity is paused or destroyed ❌
+//            repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                productsViewModel.productState.collect { state ->
+//                    when (state) {
+//                        is ResponseState.Loading -> {
+//                            binding.title.text = "Loading..."
+//                        }
+//
+//                        is ResponseState.Success -> {
+//                            val product = state.data
+//                            if (product != null) {
+//                                binding.title.text = product.title
+//                                binding.price.text = "${product.price} $"
+//                                binding.description.text = product.description
+//                                binding.image.load(product.image)
+//                            } else {
+//                                binding.title.text = "Product not found"
+//                            }
+//                        }
+//
+//                        is ResponseState.Error -> {
+//                            binding.title.text = "Error: ${state.error.message}"
+//                        }
+//                    }
+//                }
+//                // }
+//            }
+//        }
+//    }
 
