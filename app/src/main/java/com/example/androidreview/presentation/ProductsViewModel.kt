@@ -13,11 +13,29 @@ class ProductsViewModel(private val getProductsUseCase: GetProductsUseCase): Vie
     //must specific the type of StateFlow
     private val mutableProductListState :MutableStateFlow<ResponseState<List<ProductResponse>>> = MutableStateFlow(ResponseState.Loading())
     val productListState = mutableProductListState.asStateFlow()
+
+    private val mutableProductState :MutableStateFlow<ResponseState<ProductResponse?>> = MutableStateFlow(ResponseState.Loading())
+    val productState = mutableProductState.asStateFlow()
+
     fun getAllProducts(){
         viewModelScope.launch {
             getProductsUseCase.invoke().onSuccess {
                 mutableProductListState.value = ResponseState.Success(it)
             }.onFailure {
+                mutableProductListState.value = ResponseState.Error(it)
+            }
+        }
+    }
+
+    fun getProductsById(id: Int?){
+        viewModelScope.launch {
+            getProductsUseCase.invoke()
+                .onSuccess {
+                mutableProductState.value = ResponseState.Success(data = it.firstOrNull{
+                    it.id==id
+                })
+                }
+                .onFailure {
                 mutableProductListState.value = ResponseState.Error(it)
             }
         }

@@ -14,7 +14,7 @@
         android:name=".MyApp"
         android:theme="@style/Theme.AndroidReview">
         <activity
-            android:name=".MainActivity2"
+            android:name=".DetailsActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

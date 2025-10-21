@@ -33,10 +33,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.androidreview.domain.entities.ProductResponse
 import com.example.androidreview.presentation.ProductsViewModel
 import com.example.androidreview.presentation.ResponseState
+import com.example.androidreview.presentation.homeScreen.HomeScreen
 import com.example.androidreview.ui.theme.AndroidReviewTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,93 +56,38 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidReviewTheme {
                 val productsViewModel: ProductsViewModel = koinViewModel()
-                Scaffold(modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding),
-                        context = this,
-                        productsViewModel = productsViewModel
-                    )
+                val navController = rememberNavController()
+
+                NavHost(
+                    navController = navController,
+                    startDestination = "Welcome"
+                ) {
+                    composable("Welcome") { WelcomeScreen(navController) }
+                    composable("Home") {
+                        HomeScreen(
+                            navController,
+                            name = "Android",
+                            modifier = Modifier.padding(6.dp),
+                            productsViewModel = productsViewModel
+                        )
+                    }
+//                    composable("details/{itemId}",
+//                        arguments = listOf(navArgument("itemId") { type = NavType.IntType })
+//                    ) { backStackEntry ->
+//                        val itemId = backStackEntry.arguments?.getInt("itemId")
+//                        DetailsScreen(navController, itemId)
+//                    }
                 }
-            }
-
-        }
-    }
-}
 
 
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier, context: Context, productsViewModel: ProductsViewModel) {
-    val productsState by productsViewModel.productListState.collectAsStateWithLifecycle()
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "Hello $name!")
-
-        Button(onClick = {
-            productsViewModel.getAllProducts()
-        }) {
-            Text(text = "Click Me")
-        }
-        // Show product list below the button if loaded
-        when(productsState){
-            is ResponseState.Loading -> {
-                Text(text = "Loading products...")
-            }
-            is ResponseState.Success -> {
-                val products = (productsState as ResponseState.Success<List<ProductResponse>>).data
-                ProductList(products = products)
-            }
-            is ResponseState.Error -> {
-                val error = (productsState as ResponseState.Error).error
-                Text(text = "Error loading products: ${error.message}")
             }
         }
     }
 }
 
-@Composable
-fun ProductCard(product: ProductResponse) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            AsyncImage(
-                model = product.image,
-                contentDescription = product.title,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                product.title?.let { Text(text = it) }
-                Text(text = "${product.price} EGP")
-            }
-        }
-    }
-}
 
-@Composable
-fun ProductList(products: List<ProductResponse>) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        items(products) { product ->
-            ProductCard(product)
-        }
-    }
-}
+
+
+
+
+
