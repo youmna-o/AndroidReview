@@ -6,32 +6,11 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -46,16 +25,13 @@ import com.example.androidreview.ui.theme.AndroidReviewTheme
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.context.GlobalContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i("yomna", "onCreate: ")
         enableEdgeToEdge()
         setContent {
             AndroidReviewTheme {
@@ -64,7 +40,8 @@ class MainActivity : ComponentActivity() {
 
                 Observable.just("Apple", "Banana", "Orange")
                     .map { fruit -> fruit.uppercase() } // transform each item
-                    .filter { it.startsWith("A")
+                    .filter {
+                        it.startsWith("A")
                     }
                     .subscribeOn(Schedulers.io()) // run on background thread
                     .observeOn(AndroidSchedulers.mainThread())
@@ -72,9 +49,10 @@ class MainActivity : ComponentActivity() {
                     .subscribe(
                         { item ->
                             Log.i("TAG", "=========onCreate:  $item")
-                          },   // onNext
-                        { error ->  Log.i("TAG", "==================error")
-                          },    // onError
+                        },   // onNext
+                        { error ->
+                            Log.i("TAG", "==================error")
+                        },    // onError
                         { println("Done!") }                      // onComplete
                     )
                 NavHost(
@@ -102,10 +80,27 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        Log.i("yomna", "onStart: ")    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.i("yomna", "onResume: ")
+    }
+    override fun onPause() {
+        super.onPause()
+        Log.i("yomna", "onPause: ")    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.i("yomna", "onStop: ")    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("yomna", "onDestroy: ")    }
 }
-
-
-
 
 
 
