@@ -87,4 +87,10 @@ dependencies {
 
 // navigation-compose
         implementation ("androidx.navigation:navigation-compose:2.9.5")
+// Core coroutines library (contains core APIs, dispatchers like IO, Default)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:x.x.x")
+// Android-specific coroutine library (includes Dispatchers.Main)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:x.x.x")
+
+
 }
