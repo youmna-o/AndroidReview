@@ -1,9 +1,12 @@
 package com.example.androidreview
 
 import android.R
+import android.util.Log
 import java.util.Stack
 
 fun main() {
+
+
     val list = listOf(1, 2, 3, 4, 5,2,3,6,4)
    // println(newLists(list))
     val arr = intArrayOf(1,2,3,6,6,7)
@@ -42,8 +45,20 @@ fun main() {
 
 
     val solution4 = Solution4()
-    solution4.duplicateZeros(intArrayOf(1,0,2,3,0,4,5,0))
+   // solution4.duplicateZeros(intArrayOf(1,0,2,3,0,4,5,0))
 
+    val order = intArrayOf(3,1,2,5,4)
+    val friends = intArrayOf(1,3,4)
+    val solution6 = Solution6()
+   //println( solution6.recoverOrder(order,friends).joinToString(", "))
+    val myList = listOf("Red","Green","Blue")
+//    for (color in myList){
+//     println(color)
+//    }
+
+    val nums7 = intArrayOf(2,2,1)
+    val solution7 = Solution7()
+   println(solution7.singleNumber(nums7))
 }
 
 
@@ -274,4 +289,41 @@ class Solution4 {
 
 
     }
+}
+class Solution6 {
+    fun recoverOrder(order: IntArray, friends: IntArray): IntArray {
+        val myArr = mutableListOf<Int>()
+        for(i in order.indices){
+            for(j in friends.indices){
+                if(order[i]==friends[j]){
+                   myArr.add(order[i])
+                    break
+                }
+            }
+        }
+ return myArr.toIntArray()
+    }
+}
+
+class Solution7 {
+    fun singleNumber(nums: IntArray): Int {
+        var myNum =0
+        for(i in nums.indices){
+             var count = 0
+            for(j in nums.indices){
+                if (nums[i]== nums[j]){
+                    count++
+                }
+                if(count>1){
+                    break
+                }
+        }
+            if(count==1){
+               myNum= nums[i]
+                break
+            }
+
+    }
+        return myNum
+}
 }
