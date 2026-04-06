@@ -5,11 +5,19 @@ import com.example.androidreview.data.network.ApiHelperImpl
 import com.example.androidreview.data.network.ApiService
 import com.example.androidreview.data.network.RetrofitGenerator
 import com.example.androidreview.presentation.ProductsViewModel
+import com.example.androidreview.presentation.mvi.ProductMviViewModel
 import org.koin.dsl.module
 
 val viewModelsModule = module {
     single<ProductsViewModel>{
         ProductsViewModel(
+            get(),
+            getProductByIDUseCaseRX = get()
+        )
+    }
+
+    single<ProductMviViewModel>{
+        ProductMviViewModel(
             get(),
             getProductByIDUseCaseRX = get()
         )

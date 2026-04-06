@@ -15,43 +15,85 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.androidreview.DetailsActivity
 import com.example.androidreview.domain.entities.ProductResponse
 import com.example.androidreview.presentation.ProductsViewModel
 import com.example.androidreview.presentation.ResponseState
+import com.example.androidreview.presentation.mvi.ProductMviViewModel
+import com.example.androidreview.presentation.mvi.ProductsIntent
 
 @Composable
-fun HomeScreen(navController: NavController,name: String, modifier: Modifier = Modifier, productsViewModel: ProductsViewModel) {
+fun HomeScreen(navController: NavController,
+               name: String, modifier: Modifier = Modifier,
+               viewModel: ProductMviViewModel) {
     //Flow itself → not lifecycle-aware
     //When collected using repeatOnLifecycle or collectAsStateWithLifecycle → it becomes lifecycle-aware
-    val productsState by productsViewModel.productListState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
 
     LaunchedEffect(Unit) {
-        productsViewModel.getAllProducts()
+        viewModel.onIntent(ProductsIntent.FetchProducts)
     }
+
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween // Adjusts spacing between children
     ) {
         Box(modifier = Modifier.weight(1f, fill = true)) {
-            when(productsState){
-                is ResponseState.Loading -> {
+            when{
+                uiState.isLoading -> {
                     Text(text = "Loading products...")
                 }
-                is ResponseState.Success -> {
-                    val products = (productsState as ResponseState.Success<List<ProductResponse>>).data
-                    ProductList(products = products)
+                uiState.errorMessage != null -> {
+                    Text("Error: ${uiState.errorMessage}")
                 }
-                is ResponseState.Error -> {
-                    val error = (productsState as ResponseState.Error).error
-                    Text(text = "Error loading products: ${error.message}")
+                else -> {
+                    ProductList(
+                        products = uiState.products,
+
+                    )
                 }
             }
         }
 
     }
 }
+//with mvvm
+//@Composable
+//fun HomeScreen(navController: NavController,name: String, modifier: Modifier = Modifier, productsViewModel: ProductsViewModel) {
+//    //Flow itself → not lifecycle-aware
+//    //When collected using repeatOnLifecycle or collectAsStateWithLifecycle → it becomes lifecycle-aware
+//    val productsState by productsViewModel.productListState.collectAsStateWithLifecycle()
+//    val context = LocalContext.current
+//
+//
+//    LaunchedEffect(Unit) {
+//        productsViewModel.getAllProducts()
+//    }
+//    Column(
+//        modifier = modifier.fillMaxSize(),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.SpaceBetween // Adjusts spacing between children
+//    ) {
+//        Box(modifier = Modifier.weight(1f, fill = true)) {
+//            when(productsState){
+//                is ResponseState.Loading -> {
+//                    Text(text = "Loading products...")
+//                }
+//                is ResponseState.Success -> {
+//                    val products = (productsState as ResponseState.Success<List<ProductResponse>>).data
+//                    ProductList(products = products)
+//                }
+//                is ResponseState.Error -> {
+//                    val error = (productsState as ResponseState.Error).error
+//                    Text(text = "Error loading products: ${error.message}")
+//                }
+//            }
+//        }
+//
+//    }
+//}

@@ -21,6 +21,7 @@ import com.example.androidreview.domain.entities.ProductResponse
 import com.example.androidreview.presentation.ProductsViewModel
 import com.example.androidreview.presentation.ResponseState
 import com.example.androidreview.presentation.homeScreen.HomeScreen
+import com.example.androidreview.presentation.mvi.ProductMviViewModel
 import com.example.androidreview.ui.theme.AndroidReviewTheme
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidReviewTheme {
                 val productsViewModel: ProductsViewModel = koinViewModel()
+                val productsViewModelMvi: ProductMviViewModel = koinViewModel()
                 val navController = rememberNavController()
 
                 Observable.just("Apple", "Banana", "Orange")
@@ -65,7 +67,7 @@ class MainActivity : ComponentActivity() {
                             navController,
                             name = "Android",
                             modifier = Modifier.padding(6.dp),
-                            productsViewModel = productsViewModel
+                            viewModel = productsViewModelMvi
                         )
                     }
 //                    composable("details/{itemId}",

@@ -30,14 +30,21 @@ import com.example.androidreview.domain.entities.ProductResponse
 
 
 @Composable
-fun ProductList(products: List<ProductResponse>) {
+fun ProductList(
+    // with mvvm
+   // products: List<ProductResponse>,
+
+    //with mvi
+    products: List<ProductResponse>,
+   // onProductClick: (Int) -> Unit
+) {
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
             .padding(8.dp)
     ) {
-        items(products) { product ->
-            ProductCard(product , context)
+        items(products) {
+            product -> ProductCard(product , context)
         }
     }
 }
