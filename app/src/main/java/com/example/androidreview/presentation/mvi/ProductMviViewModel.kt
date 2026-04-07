@@ -9,8 +9,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,17 +23,20 @@ class ProductMviViewModel(
 )  : ViewModel(){
     private val _uiState = MutableStateFlow(ProductUiState())
     val uiState: StateFlow<ProductUiState> = _uiState.asStateFlow()
-
+    private val _effect = MutableSharedFlow<ProductsEffect>()
+    val effect = _effect.asSharedFlow()
 
     private var disposable: Disposable? = null
 
-    fun onIntent(intent: ProductsIntent) {
+     fun onIntent(intent: ProductsIntent) {
         when (intent) {
             is ProductsIntent.FetchProducts -> {
                 fetchProducts()
             }
-            is ProductsIntent.FetchProductByID -> {
-                fetchProductByID(intent.id)
+            is ProductsIntent.OpenProductByID -> {
+                viewModelScope.launch {
+                    _effect.emit(ProductsEffect.NavigateToShowDetails(intent.id.toString()))            }
+
             }
         }
     }
@@ -68,7 +73,7 @@ class ProductMviViewModel(
         }
     }
 
-    private fun fetchProductByID(id: Int) {
+    private fun openProductByID(id: Int) {
 
         // 1. Loading state
         _uiState.update {

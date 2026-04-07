@@ -36,20 +36,23 @@ fun ProductList(
 
     //with mvi
     products: List<ProductResponse>,
-   // onProductClick: (Int) -> Unit
-) {
+    onOpenDetails: (Int) -> Unit) {
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
             .padding(8.dp)
     ) {
         items(products) {
-            product -> ProductCard(product , context)
+            product -> ProductCard(
+            product, context,
+            onOpenDetails = onOpenDetails
+        )
         }
     }
 }
 @Composable
-fun ProductCard(product: ProductResponse, context: Context) {
+fun ProductCard(product: ProductResponse, context: Context,
+                onOpenDetails: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -73,9 +76,10 @@ fun ProductCard(product: ProductResponse, context: Context) {
                 product.title?.let { Text(text = it) }
                 Text(text = "${product.price} EGP")
                 Button(onClick = {
-                    val intent = Intent(context, DetailsActivity::class.java)
-                    intent.putExtra("itemId", product.id)
-                    context.startActivity(intent)
+                    product.id?.let { id -> onOpenDetails(id) }
+//                    val intent = Intent(context, DetailsActivity::class.java)
+//                    intent.putExtra("itemId", product.id)
+//                    context.startActivity(intent)
                 }) {
                     Text("Go to Details Screen")
                 }

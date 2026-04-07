@@ -22,6 +22,7 @@ import com.example.androidreview.domain.entities.ProductResponse
 import com.example.androidreview.presentation.ProductsViewModel
 import com.example.androidreview.presentation.ResponseState
 import com.example.androidreview.presentation.mvi.ProductMviViewModel
+import com.example.androidreview.presentation.mvi.ProductsEffect
 import com.example.androidreview.presentation.mvi.ProductsIntent
 
 @Composable
@@ -36,6 +37,17 @@ fun HomeScreen(navController: NavController,
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(ProductsIntent.FetchProducts)
+    }
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is ProductsEffect.NavigateToShowDetails -> {
+                    val intent = Intent(context, DetailsActivity::class.java)
+                    intent.putExtra("itemId", effect.productId.toInt()) // or pass Int directly
+                    context.startActivity(intent)
+                }
+            }
+        }
     }
 
     Column(
@@ -54,6 +66,9 @@ fun HomeScreen(navController: NavController,
                 else -> {
                     ProductList(
                         products = uiState.products,
+                        onOpenDetails = { productId ->
+                            viewModel.onIntent(ProductsIntent.OpenProductByID(productId))
+                        }
 
                     )
                 }
